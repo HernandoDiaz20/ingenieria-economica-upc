@@ -24,5 +24,5 @@ flutter pub get
 ```bash
 flutter run
 ```
-👥 Desarrolladores
+👥 Desarrolladores:
 Hernando Díaz - David Palomino
