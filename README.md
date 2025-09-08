@@ -1,16 +1,28 @@
-# ingenieria_economica
+# Ingeniería Económica UPC
 
-A new Flutter project.
+Aplicación móvil para cálculos de ingeniería económica desarrollada en Flutter.
 
-## Getting Started
+## 🚀 Funcionalidades
 
-This project is a starting point for a Flutter application.
+- ✅ Sistema de autenticación
+- ✅ Cálculo de interés simple
+- ✅ Cálculo de interés compuesto  
+- ✅ Cálculo de anualidades
+- ✅ Cálculo de tasa de interés
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Instalación
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clonar repositorio 
+```bash 
+git clone https://github.com/HernandoDiaz20/ingenieria-economica-upc.git
+```
+2. Instalar dependencias
+```bash
+flutter pub get
+```
+3. Ejecutar aplicación
+```bash
+flutter run
+```
+👥 Desarrolladores
+Hernando Díaz - David Palomino
