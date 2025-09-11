@@ -10,7 +10,9 @@ class _AnnuitiesDialogState extends State<AnnuitiesDialog> {
   final _paymentController = TextEditingController();
   final _rateController = TextEditingController();
   final _timeController = TextEditingController();
-  String _annuityType = 'ordinary';
+
+  String _annuityType = 'ordinary'; // vencida o anticipada
+  String _calculationType = 'VA'; // VA (Valor Actual) o VF (Valor Futuro)
 
   void _calculateAnnuity(BuildContext context) {
     final payment = double.tryParse(_paymentController.text) ?? 0;
@@ -18,19 +20,35 @@ class _AnnuitiesDialogState extends State<AnnuitiesDialog> {
     final time = double.tryParse(_timeController.text) ?? 0;
 
     final rateDecimal = rate / 100;
-    double presentValue;
+    double result = 0;
 
-    if (rateDecimal == 0) {
-      presentValue = payment * time;
-    } else {
-      if (_annuityType == 'ordinary') {
-        presentValue =
-            payment * (1 - pow(1 + rateDecimal, -time)) / rateDecimal;
+    if (_calculationType == 'VA') {
+      // Valor Actual
+      if (rateDecimal == 0) {
+        result = payment * time;
       } else {
-        presentValue = payment *
-            (1 - pow(1 + rateDecimal, -time)) /
-            rateDecimal *
-            (1 + rateDecimal);
+        if (_annuityType == 'ordinary') {
+          result = payment * (1 - pow(1 + rateDecimal, -time)) / rateDecimal;
+        } else {
+          result = payment *
+              (1 - pow(1 + rateDecimal, -time)) /
+              rateDecimal *
+              (1 + rateDecimal);
+        }
+      }
+    } else {
+      // Valor Futuro
+      if (rateDecimal == 0) {
+        result = payment * time;
+      } else {
+        if (_annuityType == 'ordinary') {
+          result = payment * (pow(1 + rateDecimal, time) - 1) / rateDecimal;
+        } else {
+          result = payment *
+              (pow(1 + rateDecimal, time) - 1) /
+              rateDecimal *
+              (1 + rateDecimal);
+        }
       }
     }
 
@@ -38,18 +56,18 @@ class _AnnuitiesDialogState extends State<AnnuitiesDialog> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-            'Resultado - Anualidad ${_annuityType == 'ordinary' ? 'Vencida' : 'Anticipada'}'),
+            'Resultado - ${_calculationType == 'VA' ? 'Valor Actual' : 'Valor Futuro'} (${_annuityType == 'ordinary' ? 'Vencida' : 'Anticipada'})'),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Pago periódico: \$${payment.toStringAsFixed(2)}'),
-              Text('Tasa de interés: ${rate.toStringAsFixed(2)}%'),
-              Text('Número de períodos: ${time.toStringAsFixed(0)}'),
-              Text(
-                  'Tipo: ${_annuityType == 'ordinary' ? 'Vencida' : 'Anticipada'}'),
+              Text('Pago periódico (A): \$${payment.toStringAsFixed(2)}'),
+              Text('Tasa de interés (i): ${rate.toStringAsFixed(2)}%'),
+              Text('Número de períodos (n): ${time.toStringAsFixed(0)}'),
+              Text('Tipo de anualidad: ${_annuityType == 'ordinary' ? 'Vencida' : 'Anticipada'}'),
               SizedBox(height: 10),
-              Text('Valor presente: \$${presentValue.toStringAsFixed(2)}',
+              Text(
+                  '${_calculationType == 'VA' ? 'Valor Actual' : 'Valor Futuro'}: \$${result.toStringAsFixed(2)}',
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.blue)),
             ],
@@ -93,6 +111,7 @@ class _AnnuitiesDialogState extends State<AnnuitiesDialog> {
               keyboardType: TextInputType.number,
             ),
             SizedBox(height: 10),
+            // Selección de tipo de anualidad
             DropdownButtonFormField(
               value: _annuityType,
               decoration: InputDecoration(labelText: 'Tipo de anualidad'),
@@ -103,6 +122,21 @@ class _AnnuitiesDialogState extends State<AnnuitiesDialog> {
               onChanged: (value) {
                 setState(() {
                   _annuityType = value.toString();
+                });
+              },
+            ),
+            SizedBox(height: 10),
+            // Selección de qué calcular (VA o VF)
+            DropdownButtonFormField(
+              value: _calculationType,
+              decoration: InputDecoration(labelText: 'Cálculo'),
+              items: [
+                DropdownMenuItem(value: 'VA', child: Text('Valor Actual (VA)')),
+                DropdownMenuItem(value: 'VF', child: Text('Valor Futuro (VF)')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _calculationType = value.toString();
                 });
               },
             ),
