@@ -3,6 +3,10 @@ import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/calculators/simple_interest_screen.dart';
+import 'screens/calculators/compound_interest_screen.dart';
+import 'screens/calculators/interest_rate_screen.dart';
+import 'screens/calculators/annuities_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,11 +22,15 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: WelcomeScreen(),
+      home: WelcomeScreen(), // ← Pantalla inicial
       routes: {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => HomeScreen(),
+        '/simple-interest': (context) => SimpleInterestScreen(),
+        '/compound-interest': (context) => CompoundInterestScreen(),
+        '/interest-rate': (context) => InterestRateScreen(),
+        '/annuities': (context) => AnnuitiesScreen(),
       },
     );
   }
