@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ingenieria_economica/screens/calculators/amortization_screen.dart';
+import 'package:ingenieria_economica/screens/calculators/gradients_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
@@ -31,6 +33,8 @@ class MyApp extends StatelessWidget {
         '/compound-interest': (context) => CompoundInterestScreen(),
         '/interest-rate': (context) => InterestRateScreen(),
         '/annuities': (context) => AnnuitiesScreen(),
+        '/gradients': (context) => GradientsScreen(),
+        '/amortization': (context) => AmortizationScreen(),
       },
     );
   }
