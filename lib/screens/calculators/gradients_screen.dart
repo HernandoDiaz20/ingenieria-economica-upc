@@ -75,6 +75,141 @@ class _GradientsScreenState extends State<GradientsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Tarjeta informativa sobre Gradientes
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppConstants.secondaryDarkBlue.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppConstants.neonBlue.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.trending_up,
+                          color: AppConstants.neonBlue,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '¿Qué son los Gradientes?',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Los gradientes son series de flujos de efectivo que aumentan o disminuyen en cada período según un patrón específico. Se usan para modelar ingresos o costos que cambian sistemáticamente.',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    // Información específica por tipo de gradiente
+                    if (_gradientType == 'Aritmético') ...[
+                      Text(
+                        'Gradiente Aritmético:',
+                        style: TextStyle(
+                          color: AppConstants.neonBlue,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        '• Incremento constante en cada período\n• Fórmula VP: A × [(1 - (1+i)⁻ⁿ)/i] + (G/i) × [(1 - (1+i)⁻ⁿ)/i - n×(1+i)⁻ⁿ]\n• El primer flujo NO incluye el incremento',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                    ] else ...[
+                      Text(
+                        'Gradiente Geométrico:',
+                        style: TextStyle(
+                          color: AppConstants.neonBlue,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        '• Incremento porcentual constante en cada período\n• Fórmula VP: A₁ × [1 - (1+g)ⁿ(1+i)⁻ⁿ] / (i - g)\n• Cuando i = g: VP = A₁ × [n / (1+i)]',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                    SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        _buildVariableInfo('A, A₁', 'Primer flujo de caja'),
+                        _buildVariableInfo('i', 'Tasa de interés periódica'),
+                        _buildVariableInfo('n', 'Número de periodos'),
+                        _buildVariableInfo(
+                            'G', 'Incremento constante (Aritmético)'),
+                        _buildVariableInfo(
+                            'g', 'Tasa crecimiento % (Geométrico)'),
+                        _buildVariableInfo('VP', 'Valor Presente'),
+                        _buildVariableInfo('VF', 'Valor Futuro'),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: Colors.orange.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.orange,
+                            size: 16,
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _gradientType == 'Aritmético'
+                                  ? 'En gradiente aritmético: El primer flujo base NO incluye el incremento constante G.'
+                                  : 'En gradiente geométrico: La tasa de crecimiento g se ingresa en porcentaje.',
+                              style: TextStyle(
+                                color: Colors.orange,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 25),
+
               // Descripción
               Text(
                 'Calculadora para determinar el valor presente o futuro de series variables con crecimiento aritmético o geométrico',
@@ -188,7 +323,9 @@ class _GradientsScreenState extends State<GradientsScreen> {
               // Campos de entrada
               InputField(
                 controller: _firstFlowController,
-                label: _gradientType == 'Aritmético' ? 'Primer Flujo (A)' : 'Flujo Inicial (A₁)',
+                label: _gradientType == 'Aritmético'
+                    ? 'Primer Flujo (A)'
+                    : 'Flujo Inicial (A₁)',
                 icon: Icons.attach_money,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 validator: (value) => _validateNumber(value, 'el primer flujo'),
@@ -220,42 +357,19 @@ class _GradientsScreenState extends State<GradientsScreen> {
 
               InputField(
                 controller: _gradientController,
-                label: _gradientType == 'Aritmético' ? 'Incremento Constante (G)' : 'Tasa Crecimiento (g) %',
-                icon: _gradientType == 'Aritmético' ? Icons.trending_up : Icons.percent,
+                label: _gradientType == 'Aritmético'
+                    ? 'Incremento Constante (G)'
+                    : 'Tasa Crecimiento (g) %',
+                icon: _gradientType == 'Aritmético'
+                    ? Icons.trending_up
+                    : Icons.percent,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                validator: (value) => _gradientType == 'Aritmético' 
+                validator: (value) => _gradientType == 'Aritmético'
                     ? _validateNumber(value, 'el incremento constante')
                     : _validateNumber(value, 'la tasa de crecimiento'),
               ),
 
               SizedBox(height: 30),
-
-              // Información adicional
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppConstants.neonBlue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppConstants.neonBlue.withOpacity(0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: AppConstants.neonBlue, size: 16),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Para gradiente aritmético: El primer flujo NO incluye el incremento',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(height: 20),
 
               // Botones de acción
               Row(
@@ -319,89 +433,135 @@ class _GradientsScreenState extends State<GradientsScreen> {
     );
   }
 
-  void _calculate() {
-  if (_formKey.currentState!.validate()) {
-    double firstFlow = double.parse(_firstFlowController.text);
-    double rate = double.parse(_rateController.text) / 100;
-    int periods = int.parse(_periodsController.text);
-    double gradientValue = double.parse(_gradientController.text);
-    double resultValue = 0.0;
-    String resultText = '';
-
-    setState(() {
-      if (_gradientType == 'Aritmético') {
-        // GRADIENTE ARITMÉTICO - FÓRMULA CORREGIDA
-        if (_calculationType == 'Valor Presente') {
-          // Fórmula exacta del ejemplo: VP = A * [(1 - (1+i)^-n)/i] + (G/i) * [(1 - (1+i)^-n)/i - n*(1+i)^-n]
-          double uniformPart = firstFlow * ((1 - pow(1 + rate, -periods)) / rate);
-          double gradientPart = (gradientValue / rate) * 
-              (((1 - pow(1 + rate, -periods)) / rate) - periods * pow(1 + rate, -periods));
-          
-          resultValue = uniformPart + gradientPart;
-          resultText = 'Valor Presente (VP): \$${resultValue.toStringAsFixed(2)}';
-        } else {
-          // Valor Futuro para Gradiente Aritmético
-          // VF = A * [((1+i)^n - 1)/i] + (G/i) * [((1+i)^n - 1)/i - n]
-          double uniformPart = firstFlow * ((pow(1 + rate, periods) - 1) / rate);
-          double gradientPart = (gradientValue / rate) * 
-              (((pow(1 + rate, periods) - 1) / rate) - periods);
-          
-          resultValue = uniformPart + gradientPart;
-          resultText = 'Valor Futuro (VF): \$${resultValue.toStringAsFixed(2)}';
-        }
-      } else {
-        // GRADIENTE GEOMÉTRICO
-        double growthRate = gradientValue / 100;
-        
-        if (_calculationType == 'Valor Presente') {
-          if (rate == growthRate) {
-            // Caso especial: i = g
-            resultValue = firstFlow * (periods / (1 + rate));
-            resultText = 'Valor Presente (VP): \$${resultValue.toStringAsFixed(2)}';
-          } else {
-            // Caso general: i ≠ g
-            // VP = A₁ * [1 - (1+g)ⁿ(1+i)⁻ⁿ] / (i - g)
-            try {
-              double term1 = pow(1 + growthRate, periods).toDouble();
-              double term2 = pow(1 + rate, -periods).toDouble();
-              double numerator = 1 - (term1 * term2);
-              resultValue = firstFlow * (numerator / (rate - growthRate));
-              resultText = 'Valor Presente (VP): \$${resultValue.toStringAsFixed(2)}';
-            } catch (e) {
-              resultText = 'Error en el cálculo. Verifica los valores ingresados.';
-              resultValue = 0.0;
-            }
-          }
-        } else {
-          // Valor Futuro para geométrico
-          // VF = VP * (1+i)^n
-          double presentValue;
-          if (rate == growthRate) {
-            presentValue = firstFlow * (periods / (1 + rate));
-          } else {
-            try {
-              double term1 = pow(1 + growthRate, periods).toDouble();
-              double term2 = pow(1 + rate, -periods).toDouble();
-              double numerator = 1 - (term1 * term2);
-              presentValue = firstFlow * (numerator / (rate - growthRate));
-            } catch (e) {
-              resultText = 'Error en el cálculo. Verifica los valores ingresados.';
-              resultValue = 0.0;
-              _resultValue = resultValue;
-              _resultText = resultText;
-              return;
-            }
-          }
-          resultValue = presentValue * pow(1 + rate, periods).toDouble();
-          resultText = 'Valor Futuro (VF): \$${resultValue.toStringAsFixed(2)}';
-        }
-      }
-
-      _resultValue = resultValue;
-      _resultText = resultText;
-    });
+  // Widget auxiliar para mostrar información de variables
+  Widget _buildVariableInfo(String variable, String description) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppConstants.neonBlue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: AppConstants.neonBlue.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$variable: ',
+              style: TextStyle(
+                color: AppConstants.neonBlue,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            TextSpan(
+              text: description,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-}
+
+  void _calculate() {
+    if (_formKey.currentState!.validate()) {
+      double firstFlow = double.parse(_firstFlowController.text);
+      double rate = double.parse(_rateController.text) / 100;
+      int periods = int.parse(_periodsController.text);
+      double gradientValue = double.parse(_gradientController.text);
+      double resultValue = 0.0;
+      String resultText = '';
+
+      setState(() {
+        if (_gradientType == 'Aritmético') {
+          // GRADIENTE ARITMÉTICO - FÓRMULA CORREGIDA
+          if (_calculationType == 'Valor Presente') {
+            // Fórmula exacta del ejemplo: VP = A * [(1 - (1+i)^-n)/i] + (G/i) * [(1 - (1+i)^-n)/i - n*(1+i)^-n]
+            double uniformPart =
+                firstFlow * ((1 - pow(1 + rate, -periods)) / rate);
+            double gradientPart = (gradientValue / rate) *
+                (((1 - pow(1 + rate, -periods)) / rate) -
+                    periods * pow(1 + rate, -periods));
+
+            resultValue = uniformPart + gradientPart;
+            resultText =
+                'Valor Presente (VP): \$${resultValue.toStringAsFixed(2)}';
+          } else {
+            // Valor Futuro para Gradiente Aritmético
+            // VF = A * [((1+i)^n - 1)/i] + (G/i) * [((1+i)^n - 1)/i - n]
+            double uniformPart =
+                firstFlow * ((pow(1 + rate, periods) - 1) / rate);
+            double gradientPart = (gradientValue / rate) *
+                (((pow(1 + rate, periods) - 1) / rate) - periods);
+
+            resultValue = uniformPart + gradientPart;
+            resultText =
+                'Valor Futuro (VF): \$${resultValue.toStringAsFixed(2)}';
+          }
+        } else {
+          // GRADIENTE GEOMÉTRICO
+          double growthRate = gradientValue / 100;
+
+          if (_calculationType == 'Valor Presente') {
+            if (rate == growthRate) {
+              // Caso especial: i = g
+              resultValue = firstFlow * (periods / (1 + rate));
+              resultText =
+                  'Valor Presente (VP): \$${resultValue.toStringAsFixed(2)}';
+            } else {
+              // Caso general: i ≠ g
+              // VP = A₁ * [1 - (1+g)ⁿ(1+i)⁻ⁿ] / (i - g)
+              try {
+                double term1 = pow(1 + growthRate, periods).toDouble();
+                double term2 = pow(1 + rate, -periods).toDouble();
+                double numerator = 1 - (term1 * term2);
+                resultValue = firstFlow * (numerator / (rate - growthRate));
+                resultText =
+                    'Valor Presente (VP): \$${resultValue.toStringAsFixed(2)}';
+              } catch (e) {
+                resultText =
+                    'Error en el cálculo. Verifica los valores ingresados.';
+                resultValue = 0.0;
+              }
+            }
+          } else {
+            // Valor Futuro para geométrico
+            // VF = VP * (1+i)^n
+            double presentValue;
+            if (rate == growthRate) {
+              presentValue = firstFlow * (periods / (1 + rate));
+            } else {
+              try {
+                double term1 = pow(1 + growthRate, periods).toDouble();
+                double term2 = pow(1 + rate, -periods).toDouble();
+                double numerator = 1 - (term1 * term2);
+                presentValue = firstFlow * (numerator / (rate - growthRate));
+              } catch (e) {
+                resultText =
+                    'Error en el cálculo. Verifica los valores ingresados.';
+                resultValue = 0.0;
+                _resultValue = resultValue;
+                _resultText = resultText;
+                return;
+              }
+            }
+            resultValue = presentValue * pow(1 + rate, periods).toDouble();
+            resultText =
+                'Valor Futuro (VF): \$${resultValue.toStringAsFixed(2)}';
+          }
+        }
+
+        _resultValue = resultValue;
+        _resultText = resultText;
+      });
+    }
+  }
 
   void _clearResults() {
     setState(() {

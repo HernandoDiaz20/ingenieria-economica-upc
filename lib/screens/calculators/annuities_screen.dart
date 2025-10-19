@@ -72,6 +72,116 @@ class _AnnuitiesScreenState extends State<AnnuitiesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Tarjeta informativa sobre Anualidades
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppConstants.secondaryDarkBlue.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppConstants.neonBlue.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.account_balance_wallet,
+                          color: AppConstants.neonBlue,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '¿Qué son las Anualidades?',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'Una anualidad es una serie de pagos iguales realizados a intervalos regulares durante un período determinado. Se usa comúnmente en planes de ahorro, pensiones y créditos.',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Valor Final: VF = A × [(1 + i)ⁿ - 1] / i',
+                      style: TextStyle(
+                        color: AppConstants.neonBlue,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Valor Actual: VA = A × [1 - (1 + i)⁻ⁿ] / i',
+                      style: TextStyle(
+                        color: AppConstants.neonBlue,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        _buildVariableInfo('A', 'Anualidad (pago periódico)'),
+                        _buildVariableInfo('i', 'Tasa de interés por periodo'),
+                        _buildVariableInfo('n', 'Número de periodos'),
+                        _buildVariableInfo('VF', 'Valor Futuro'),
+                        _buildVariableInfo('VA', 'Valor Actual'),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: Colors.green.withOpacity(0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.timeline,
+                            color: Colors.green,
+                            size: 16,
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Valor Final: Monto acumulado al final de los periodos.\nValor Actual: Valor presente de los pagos futuros.',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 25),
+
               // Descripción
               Text(
                 'Calculadora para determinar el valor final o valor actual de una anualidad',
@@ -223,6 +333,42 @@ class _AnnuitiesScreenState extends State<AnnuitiesScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Widget auxiliar para mostrar información de variables
+  Widget _buildVariableInfo(String variable, String description) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppConstants.neonBlue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: AppConstants.neonBlue.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$variable: ',
+              style: TextStyle(
+                color: AppConstants.neonBlue,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            TextSpan(
+              text: description,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
       ),
     );

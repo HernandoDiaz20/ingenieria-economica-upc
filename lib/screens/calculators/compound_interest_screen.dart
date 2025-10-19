@@ -80,6 +80,85 @@ class _CompoundInterestScreenState extends State<CompoundInterestScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Tarjeta informativa sobre Interés Compuesto
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppConstants.secondaryDarkBlue.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppConstants.neonBlue.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: AppConstants.neonBlue,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '¿Qué es el Interés Compuesto?',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'El interés compuesto se calcula sobre el capital inicial más los intereses acumulados de periodos anteriores. Los intereses generan más intereses (capitalización).',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Fórmula: MC = C × (1 + i)ⁿ',
+                      style: TextStyle(
+                        color: AppConstants.neonBlue,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        _buildVariableInfo('MC', 'Monto Compuesto'),
+                        _buildVariableInfo('C', 'Capital Inicial'),
+                        _buildVariableInfo('i', 'Tasa de interés por periodo'),
+                        _buildVariableInfo('n', 'Número de periodos'),
+                        _buildVariableInfo('IC', 'Interés Compuesto = MC - C'),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Característica clave: "El interés genera más interés"',
+                      style: TextStyle(
+                        color: Colors.greenAccent,
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 25),
+
               // Descripción
               Text(
                 'Calculadora para determinar interés compuesto, monto compuesto, capital, tasa de interés o tiempo necesario',
@@ -203,6 +282,42 @@ class _CompoundInterestScreenState extends State<CompoundInterestScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Widget auxiliar para mostrar información de variables
+  Widget _buildVariableInfo(String variable, String description) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppConstants.neonBlue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: AppConstants.neonBlue.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$variable: ',
+              style: TextStyle(
+                color: AppConstants.neonBlue,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            TextSpan(
+              text: description,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
       ),
     );

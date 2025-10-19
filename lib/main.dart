@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ingenieria_economica/screens/calculators/amortization_screen.dart';
-import 'package:ingenieria_economica/screens/calculators/gradients_screen.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
@@ -9,6 +7,11 @@ import 'screens/calculators/simple_interest_screen.dart';
 import 'screens/calculators/compound_interest_screen.dart';
 import 'screens/calculators/interest_rate_screen.dart';
 import 'screens/calculators/annuities_screen.dart';
+import 'screens/calculators/amortization_screen.dart';
+import 'screens/calculators/gradients_screen.dart';
+import 'screens/calculators/capitalization_screen.dart';
+import 'screens/calculators/tir_screen.dart';
+import 'screens/forgot_password_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -35,6 +38,9 @@ class MyApp extends StatelessWidget {
         '/annuities': (context) => AnnuitiesScreen(),
         '/gradients': (context) => GradientsScreen(),
         '/amortization': (context) => AmortizationScreen(),
+        '/capitalization': (context) => CapitalizationScreen(),
+        '/tir': (context) => TirScreen(),
+        '/forgot-password': (context) => ForgotPasswordScreen(),
       },
     );
   }

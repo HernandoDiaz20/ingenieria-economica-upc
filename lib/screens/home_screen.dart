@@ -170,46 +170,59 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildCalculatorsGrid(BuildContext context) {
-  return Expanded(
-    child: GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 0.95,
-      children: [
-        CalculatorButton(
-          title: 'Interés Simple',
-          icon: Icons.calculate,
-          onPressed: () => Navigator.pushNamed(context, '/simple-interest'),
-        ),
-        CalculatorButton(
-          title: 'Interés Compuesto',
-          icon: Icons.auto_graph,
-          onPressed: () => Navigator.pushNamed(context, '/compound-interest'),
-        ),
-        CalculatorButton(
-          title: 'Tasa de Interés',
-          icon: Icons.trending_up,
-          onPressed: () => Navigator.pushNamed(context, '/interest-rate'),
-        ),
-        CalculatorButton(
-          title: 'Anualidades',
-          icon: Icons.pie_chart,
-          onPressed: () => Navigator.pushNamed(context, '/annuities'),
-        ),
-        CalculatorButton( // ← NUEVO BOTÓN
-          title: 'Gradientes',
-          icon: Icons.show_chart,
-          onPressed: () => Navigator.pushNamed(context, '/gradients'),
-        ),
-         CalculatorButton( // ← NUEVO BOTÓN
-          title: 'Amortización',
-          icon: Icons.account_balance,
-          onPressed: () => Navigator.pushNamed(context, '/amortization'),
-        ),
-      ],
-    ),
-  );
-}
-  
+    return Expanded(
+      child: GridView.count(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.95,
+        children: [
+          // Fila 1
+          CalculatorButton(
+            title: 'Interés Simple',
+            icon: Icons.calculate,
+            onPressed: () => Navigator.pushNamed(context, '/simple-interest'),
+          ),
+          CalculatorButton(
+            title: 'Interés Compuesto',
+            icon: Icons.auto_graph,
+            onPressed: () => Navigator.pushNamed(context, '/compound-interest'),
+          ),
+          // Fila 2
+          CalculatorButton(
+            title: 'Tasa de Interés',
+            icon: Icons.trending_up,
+            onPressed: () => Navigator.pushNamed(context, '/interest-rate'),
+          ),
+          CalculatorButton(
+            title: 'Anualidades',
+            icon: Icons.pie_chart,
+            onPressed: () => Navigator.pushNamed(context, '/annuities'),
+          ),
+          // Fila 3
+          CalculatorButton(
+            title: 'Gradientes',
+            icon: Icons.waterfall_chart,
+            onPressed: () => Navigator.pushNamed(context, '/gradients'),
+          ),
+          CalculatorButton(
+            title: 'Amortización',
+            icon: Icons.account_balance,
+            onPressed: () => Navigator.pushNamed(context, '/amortization'),
+          ),
+          // Fila 4 - NUEVOS BOTONES
+          CalculatorButton(
+            title: 'Capitalización',
+            icon: Icons.attach_money,
+            onPressed: () => Navigator.pushNamed(context, '/capitalization'),
+          ),
+          CalculatorButton(
+            title: 'TIR',
+            icon: Icons.stacked_line_chart,
+            onPressed: () => Navigator.pushNamed(context, '/tir'),
+          ),
+        ],
+      ),
+    );
+  }
 }

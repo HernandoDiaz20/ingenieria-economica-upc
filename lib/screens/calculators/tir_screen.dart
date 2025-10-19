@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import '../../utils/constants.dart';
 import '../../widgets/components/input_field.dart';
-import '../../widgets/components/time_selector.dart';
 import '../../widgets/components/result_card.dart';
 
-class InterestRateScreen extends StatefulWidget {
-  const InterestRateScreen({super.key});
+class TirScreen extends StatefulWidget {
+  const TirScreen({super.key});
 
   @override
-  _InterestRateScreenState createState() => _InterestRateScreenState();
+  _TirScreenState createState() => _TirScreenState();
 }
 
-class _InterestRateScreenState extends State<InterestRateScreen> {
+class _TirScreenState extends State<TirScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _interestController = TextEditingController();
-  final TextEditingController _capitalController = TextEditingController();
-  final TextEditingController _yearsController = TextEditingController();
-  final TextEditingController _monthsController = TextEditingController();
-  final TextEditingController _daysController = TextEditingController();
+  final TextEditingController _investmentController = TextEditingController();
+  final List<TextEditingController> _cashFlowControllers = [
+    TextEditingController()
+  ];
   String _resultText = 'Realiza un cálculo para ver el resultado';
   double _resultValue = 0.0;
 
@@ -27,21 +26,137 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
       return 'Por favor ingresa $fieldName';
     }
 
-    final numberRegex = RegExp(r'^\d*\.?\d*$');
+    final numberRegex = RegExp(r'^-?\d*\.?\d*$'); // Permite negativos
     if (!numberRegex.hasMatch(value)) {
       return 'Ingresa solo números válidos';
     }
 
-    if (value.startsWith('-')) {
-      return 'No se permiten valores negativos';
-    }
-
     final numericValue = double.tryParse(value);
-    if (numericValue == null || numericValue < 0) {
-      return 'Ingresa un valor válido mayor o igual a 0';
+    if (numericValue == null) {
+      return 'Ingresa un valor válido';
     }
 
     return null;
+  }
+
+  // Agregar nuevo flujo de caja
+  void _addCashFlow() {
+    setState(() {
+      _cashFlowControllers.add(TextEditingController());
+    });
+  }
+
+  // Remover flujo de caja
+  void _removeCashFlow(int index) {
+    if (_cashFlowControllers.length > 1) {
+      setState(() {
+        _cashFlowControllers.removeAt(index);
+      });
+    }
+  }
+
+  // Calcular TIR usando método de aproximación (Newton-Raphson simplificado)
+  double _calculateTIR(double investment, List<double> cashFlows) {
+    // Método iterativo para encontrar la TIR
+    double tir = 0.1; // Tasa inicial del 10%
+    double precision = 0.0001; // Precisión de 0.01%
+    int maxIterations = 100;
+
+    for (int i = 0; i < maxIterations; i++) {
+      double npv = _calculateNPV(investment, cashFlows, tir);
+      double npvDerivative =
+          _calculateNPVDerivative(investment, cashFlows, tir);
+
+      if (npvDerivative.abs() < precision) break;
+
+      double newTir = tir - npv / npvDerivative;
+
+      if ((newTir - tir).abs() < precision) {
+        return newTir;
+      }
+
+      tir = newTir;
+    }
+
+    return tir;
+  }
+
+  // Calcular VPN para una tasa dada
+  double _calculateNPV(double investment, List<double> cashFlows, double rate) {
+    double npv = -investment; // Inversión inicial (negativa)
+
+    for (int i = 0; i < cashFlows.length; i++) {
+      npv += cashFlows[i] / pow(1 + rate, i + 1);
+    }
+
+    return npv;
+  }
+
+  // Calcular derivada del VPN (para método Newton-Raphson)
+  double _calculateNPVDerivative(
+      double investment, List<double> cashFlows, double rate) {
+    double derivative = 0;
+
+    for (int i = 0; i < cashFlows.length; i++) {
+      derivative -= (i + 1) * cashFlows[i] / pow(1 + rate, i + 2);
+    }
+
+    return derivative;
+  }
+
+  void _calculate() {
+    if (_formKey.currentState!.validate()) {
+      double investment = double.parse(_investmentController.text);
+      List<double> cashFlows = [];
+
+      for (var controller in _cashFlowControllers) {
+        if (controller.text.isNotEmpty) {
+          cashFlows.add(double.parse(controller.text));
+        }
+      }
+
+      // Validar que hay flujos de caja
+      if (cashFlows.isEmpty) {
+        setState(() {
+          _resultText = 'Error: Debes ingresar al menos un flujo de caja';
+          _resultValue = 0.0;
+        });
+        return;
+      }
+
+      try {
+        double tir = _calculateTIR(investment, cashFlows);
+
+        setState(() {
+          _resultValue = tir * 100; // Convertir a porcentaje
+          _resultText =
+              'Tasa Interna de Retorno (TIR): ${_resultValue.toStringAsFixed(2)}%';
+        });
+      } catch (e) {
+        setState(() {
+          _resultText =
+              'Error: No se pudo calcular la TIR. Verifica los datos.';
+          _resultValue = 0.0;
+        });
+      }
+    }
+  }
+
+  void _clearResults() {
+    setState(() {
+      _resultText = 'Realiza un cálculo para ver el resultado';
+      _resultValue = 0.0;
+      _investmentController.clear();
+      for (var controller in _cashFlowControllers) {
+        controller.clear();
+      }
+      // Mantener al menos un flujo de caja
+      if (_cashFlowControllers.length > 1) {
+        _cashFlowControllers
+          ..clear()
+          ..add(TextEditingController());
+      }
+    });
   }
 
   @override
@@ -56,7 +171,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Tasa de Interés',
+          'TIR - Tasa Interna de Retorno',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -71,7 +186,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Tarjeta informativa sobre Tasa de Interés
+              // Tarjeta informativa sobre TIR
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(16),
@@ -89,13 +204,13 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                     Row(
                       children: [
                         Icon(
-                          Icons.trending_up,
+                          Icons.auto_graph,
                           color: AppConstants.neonBlue,
                           size: 20,
                         ),
                         SizedBox(width: 8),
                         Text(
-                          'Cálculo de Tasa de Interés Simple',
+                          'Tasa Interna de Retorno (TIR)',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -106,7 +221,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                     ),
                     SizedBox(height: 12),
                     Text(
-                      'Calcula la tasa de interés necesaria para generar un monto específico de interés sobre un capital en un período determinado.',
+                      'La TIR es la tasa de descuento que hace que el Valor Presente Neto (VPN) de todos los flujos de caja de un proyecto sea igual a cero. Es una métrica clave para evaluar la rentabilidad de inversiones.',
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -115,10 +230,10 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Fórmula: i = I / (C × t) × 100%',
+                      'Fórmula: ∑[FCₜ / (1 + TIR)ᵗ] - Inversión Inicial = 0',
                       style: TextStyle(
                         color: AppConstants.neonBlue,
-                        fontSize: 14,
+                        fontSize: 13,
                         fontWeight: FontWeight.w600,
                         fontStyle: FontStyle.italic,
                       ),
@@ -128,10 +243,10 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                       spacing: 8,
                       runSpacing: 4,
                       children: [
-                        _buildVariableInfo('i', 'Tasa de interés (%)'),
-                        _buildVariableInfo('I', 'Interés generado'),
-                        _buildVariableInfo('C', 'Capital inicial'),
-                        _buildVariableInfo('t', 'Tiempo en años'),
+                        _buildVariableInfo('TIR', 'Tasa Interna de Retorno'),
+                        _buildVariableInfo('FCₜ', 'Flujo de Caja período t'),
+                        _buildVariableInfo('t', 'Número del período'),
+                        _buildVariableInfo('VPN', 'Valor Presente Neto'),
                       ],
                     ),
                     SizedBox(height: 8),
@@ -154,7 +269,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'La tasa resultante es anual. Tiempo se convierte a años decimales.',
+                              'Interpretación: TIR > Tasa de corte → Proyecto viable\nTIR < Tasa de corte → Proyecto no viable',
                               style: TextStyle(
                                 color: Colors.orange,
                                 fontSize: 12,
@@ -172,7 +287,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
 
               // Descripción
               Text(
-                'Calculadora para determinar la tasa de interés simple',
+                'Calcula la tasa de descuento que hace que el Valor Presente Neto (VPN) de un proyecto sea igual a cero',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.white70,
@@ -182,43 +297,20 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
 
               SizedBox(height: 25),
 
-              // Campo Interés
+              // Inversión inicial
               InputField(
-                controller: _interestController,
-                label: 'Interés (I)',
+                controller: _investmentController,
+                label: 'Inversión Inicial (\$)',
                 icon: Icons.attach_money,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                validator: (value) => _validateNumber(value, 'el interés'),
+                validator: (value) =>
+                    _validateNumber(value, 'la inversión inicial'),
               ),
 
               SizedBox(height: 20),
 
-              // Campo Capital
-              InputField(
-                controller: _capitalController,
-                label: 'Capital (C)',
-                icon: Icons.account_balance_wallet,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                validator: (value) => _validateNumber(value, 'el capital'),
-              ),
-
-              SizedBox(height: 20),
-
-              // Selector de tiempo
-              TimeSelector(
-                yearsController: _yearsController,
-                monthsController: _monthsController,
-                daysController: _daysController,
-                validator: (value) {
-                  // Validar que al menos un campo de tiempo tenga valor
-                  if (_yearsController.text.isEmpty &&
-                      _monthsController.text.isEmpty &&
-                      _daysController.text.isEmpty) {
-                    return 'Ingresa al menos un valor de tiempo';
-                  }
-                  return null;
-                },
-              ),
+              // Flujos de caja
+              _buildCashFlowsSection(),
 
               SizedBox(height: 30),
 
@@ -236,7 +328,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                         ),
                       ),
                       child: Text(
-                        'Calcular Tasa',
+                        'Calcular TIR',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -248,7 +340,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                   SizedBox(width: 15),
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: _clearAllFields,
+                      onPressed: _clearResults,
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         padding: EdgeInsets.symmetric(vertical: 16),
@@ -320,74 +412,91 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
     );
   }
 
-  // Función para convertir años, meses y días a años decimales
-  double _convertTimeToYears() {
-    double years =
-        _yearsController.text.isEmpty ? 0 : double.parse(_yearsController.text);
-    double months = _monthsController.text.isEmpty
-        ? 0
-        : double.parse(_monthsController.text);
-    double days =
-        _daysController.text.isEmpty ? 0 : double.parse(_daysController.text);
+  Widget _buildCashFlowsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Flujos de Caja por Período',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 10),
+        Text(
+          'Ingresa los flujos de caja esperados para cada período (pueden ser positivos o negativos)',
+          style: TextStyle(
+            color: Colors.white54,
+            fontSize: 12,
+          ),
+        ),
+        SizedBox(height: 15),
 
-    return years + (months / 12) + (days / 360);
-  }
+        // Lista de flujos de caja
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: _cashFlowControllers.length,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: InputField(
+                      controller: _cashFlowControllers[index],
+                      label: 'Flujo Período ${index + 1} (\$)',
+                      icon: Icons.account_balance_wallet,
+                      keyboardType:
+                          TextInputType.numberWithOptions(decimal: true),
+                      validator: (value) =>
+                          _validateNumber(value, 'el flujo de caja'),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  if (_cashFlowControllers.length > 1)
+                    IconButton(
+                      icon: Icon(Icons.remove_circle, color: Colors.red),
+                      onPressed: () => _removeCashFlow(index),
+                      tooltip: 'Eliminar flujo',
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
 
-  void _calculate() {
-    if (_formKey.currentState!.validate()) {
-      double interest = double.parse(_interestController.text);
-      double capital = double.parse(_capitalController.text);
-
-      // Validar que capital no sea cero para evitar división por cero
-      if (capital == 0) {
-        setState(() {
-          _resultText = 'Error: El capital no puede ser cero';
-          _resultValue = 0.0;
-        });
-        return;
-      }
-
-      // Convertir tiempo a años decimales
-      double timeInYears = _convertTimeToYears();
-
-      // Validar que el tiempo no sea cero
-      if (timeInYears == 0) {
-        setState(() {
-          _resultText = 'Error: El tiempo no puede ser cero';
-          _resultValue = 0.0;
-        });
-        return;
-      }
-
-      // Fórmula: i = I / (C * t)
-      double rate = (interest / (capital * timeInYears)) * 100;
-
-      setState(() {
-        _resultValue = rate;
-        _resultText = 'Tasa de Interés (i): ${rate.toStringAsFixed(2)}%';
-      });
-    }
-  }
-
-  void _clearAllFields() {
-    setState(() {
-      _resultText = 'Realiza un cálculo para ver el resultado';
-      _resultValue = 0.0;
-      _interestController.clear();
-      _capitalController.clear();
-      _yearsController.clear();
-      _monthsController.clear();
-      _daysController.clear();
-    });
+        // Botón para agregar más flujos
+        SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: _addCashFlow,
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: AppConstants.neonBlue),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          icon: Icon(Icons.add, color: AppConstants.neonBlue, size: 18),
+          label: Text(
+            'Agregar Período',
+            style: TextStyle(
+              color: AppConstants.neonBlue,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
   void dispose() {
-    _capitalController.dispose();
-    _interestController.dispose();
-    _yearsController.dispose();
-    _monthsController.dispose();
-    _daysController.dispose();
+    _investmentController.dispose();
+    for (var controller in _cashFlowControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 }

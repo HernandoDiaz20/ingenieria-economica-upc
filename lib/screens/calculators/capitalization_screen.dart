@@ -1,25 +1,32 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import '../../utils/constants.dart';
 import '../../widgets/components/input_field.dart';
 import '../../widgets/components/time_selector.dart';
 import '../../widgets/components/result_card.dart';
 
-class InterestRateScreen extends StatefulWidget {
-  const InterestRateScreen({super.key});
+class CapitalizationScreen extends StatefulWidget {
+  const CapitalizationScreen({super.key});
 
   @override
-  _InterestRateScreenState createState() => _InterestRateScreenState();
+  _CapitalizationScreenState createState() => _CapitalizationScreenState();
 }
 
-class _InterestRateScreenState extends State<InterestRateScreen> {
+class _CapitalizationScreenState extends State<CapitalizationScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _interestController = TextEditingController();
   final TextEditingController _capitalController = TextEditingController();
+  final TextEditingController _rateController = TextEditingController();
   final TextEditingController _yearsController = TextEditingController();
   final TextEditingController _monthsController = TextEditingController();
   final TextEditingController _daysController = TextEditingController();
+  String _capitalizationType = 'Capitalización Simple';
   String _resultText = 'Realiza un cálculo para ver el resultado';
   double _resultValue = 0.0;
+
+  List<String> capitalizationTypes = [
+    'Capitalización Simple',
+    'Capitalización Compuesta'
+  ];
 
   // Función de validación para números
   String? _validateNumber(String? value, String fieldName) {
@@ -44,6 +51,19 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
     return null;
   }
 
+  // Función para convertir años, meses y días a años decimales
+  double _convertTimeToYears() {
+    double years =
+        _yearsController.text.isEmpty ? 0 : double.parse(_yearsController.text);
+    double months = _monthsController.text.isEmpty
+        ? 0
+        : double.parse(_monthsController.text);
+    double days =
+        _daysController.text.isEmpty ? 0 : double.parse(_daysController.text);
+
+    return years + (months / 12) + (days / 360);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +76,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Tasa de Interés',
+          'Capitalización',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -71,7 +91,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Tarjeta informativa sobre Tasa de Interés
+              // Tarjeta informativa sobre Capitalización
               Container(
                 width: double.infinity,
                 padding: EdgeInsets.all(16),
@@ -95,7 +115,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                         ),
                         SizedBox(width: 8),
                         Text(
-                          'Cálculo de Tasa de Interés Simple',
+                          'Tipos de Capitalización',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -106,7 +126,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                     ),
                     SizedBox(height: 12),
                     Text(
-                      'Calcula la tasa de interés necesaria para generar un monto específico de interés sobre un capital en un período determinado.',
+                      'La capitalización determina cómo se calculan los intereses sobre una inversión o préstamo a lo largo del tiempo.',
                       style: TextStyle(
                         color: Colors.white70,
                         fontSize: 14,
@@ -114,49 +134,80 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                       ),
                     ),
                     SizedBox(height: 8),
-                    Text(
-                      'Fórmula: i = I / (C × t) × 100%',
-                      style: TextStyle(
-                        color: AppConstants.neonBlue,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontStyle: FontStyle.italic,
+                    // Información específica por tipo de capitalización
+                    if (_capitalizationType == 'Capitalización Simple') ...[
+                      Text(
+                        'Capitalización Simple:',
+                        style: TextStyle(
+                          color: AppConstants.neonBlue,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
+                      SizedBox(height: 4),
+                      Text(
+                        '• Interés calculado siempre sobre el capital inicial\n• Crecimiento lineal en el tiempo\n• Fórmula: M = C × (1 + i × n)',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                    ] else ...[
+                      Text(
+                        'Capitalización Compuesta:',
+                        style: TextStyle(
+                          color: AppConstants.neonBlue,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        '• Interés calculado sobre el capital acumulado\n• Crecimiento exponencial (interés sobre interés)\n• Fórmula: M = C × (1 + i)ⁿ',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
                     SizedBox(height: 8),
                     Wrap(
                       spacing: 8,
                       runSpacing: 4,
                       children: [
-                        _buildVariableInfo('i', 'Tasa de interés (%)'),
-                        _buildVariableInfo('I', 'Interés generado'),
                         _buildVariableInfo('C', 'Capital inicial'),
-                        _buildVariableInfo('t', 'Tiempo en años'),
+                        _buildVariableInfo('i', 'Tasa de interés periódica'),
+                        _buildVariableInfo('n', 'Tiempo en años'),
+                        _buildVariableInfo('M', 'Monto futuro'),
                       ],
                     ),
                     SizedBox(height: 8),
                     Container(
                       padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
+                        color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(6),
                         border: Border.all(
-                          color: Colors.orange.withOpacity(0.3),
+                          color: Colors.green.withOpacity(0.3),
                         ),
                       ),
                       child: Row(
                         children: [
                           Icon(
                             Icons.lightbulb_outline,
-                            color: Colors.orange,
+                            color: Colors.green,
                             size: 16,
                           ),
                           SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'La tasa resultante es anual. Tiempo se convierte a años decimales.',
+                              _capitalizationType == 'Capitalización Simple'
+                                  ? 'Recomendada para períodos cortos y cálculos simples. Los intereses no generan más intereses.'
+                                  : 'Ideal para inversiones a largo plazo. El "interés compuesto" acelera el crecimiento.',
                               style: TextStyle(
-                                color: Colors.orange,
+                                color: Colors.green,
                                 fontSize: 12,
                               ),
                             ),
@@ -172,7 +223,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
 
               // Descripción
               Text(
-                'Calculadora para determinar la tasa de interés simple',
+                'Calculadora para determinar el monto futuro con capitalización simple o compuesta',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.white70,
@@ -182,29 +233,80 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
 
               SizedBox(height: 25),
 
-              // Campo Interés
-              InputField(
-                controller: _interestController,
-                label: 'Interés (I)',
-                icon: Icons.attach_money,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                validator: (value) => _validateNumber(value, 'el interés'),
+              // Tipo de capitalización
+              Text(
+                'Tipo de capitalización',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                value: _capitalizationType,
+                dropdownColor: AppConstants.neonBlue,
+                style: TextStyle(color: Colors.white),
+                items: capitalizationTypes
+                    .map((type) => DropdownMenuItem(
+                          value: type,
+                          child:
+                              Text(type, style: TextStyle(color: Colors.white)),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _capitalizationType = value!;
+                    _clearResults();
+                  });
+                },
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: AppConstants.secondaryDarkBlue.withOpacity(0.5),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide:
+                        BorderSide(color: AppConstants.neonBlue, width: 2),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
               ),
 
-              SizedBox(height: 20),
+              SizedBox(height: 25),
 
-              // Campo Capital
+              // Campos de entrada
               InputField(
                 controller: _capitalController,
-                label: 'Capital (C)',
-                icon: Icons.account_balance_wallet,
+                label: 'Capital Inicial (C)',
+                icon: Icons.attach_money,
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                validator: (value) => _validateNumber(value, 'el capital'),
+                validator: (value) =>
+                    _validateNumber(value, 'el capital inicial'),
               ),
 
               SizedBox(height: 20),
 
-              // Selector de tiempo
+              InputField(
+                controller: _rateController,
+                label: 'Tasa de Interés (i) %',
+                icon: Icons.percent,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                validator: (value) =>
+                    _validateNumber(value, 'la tasa de interés'),
+              ),
+
+              SizedBox(height: 20),
+
+              // Selector de tiempo (igual que en Interés Simple)
               TimeSelector(
                 yearsController: _yearsController,
                 monthsController: _monthsController,
@@ -222,7 +324,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
 
               SizedBox(height: 30),
 
-              // Botones de acción
+              // Botones de acción - MISMOS COLORES QUE INTERÉS SIMPLE
               Row(
                 children: [
                   Expanded(
@@ -236,7 +338,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                         ),
                       ),
                       child: Text(
-                        'Calcular Tasa',
+                        'Calcular Monto',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -248,7 +350,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
                   SizedBox(width: 15),
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: _clearAllFields,
+                      onPressed: _clearResults,
                       style: OutlinedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         padding: EdgeInsets.symmetric(vertical: 16),
@@ -320,61 +422,37 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
     );
   }
 
-  // Función para convertir años, meses y días a años decimales
-  double _convertTimeToYears() {
-    double years =
-        _yearsController.text.isEmpty ? 0 : double.parse(_yearsController.text);
-    double months = _monthsController.text.isEmpty
-        ? 0
-        : double.parse(_monthsController.text);
-    double days =
-        _daysController.text.isEmpty ? 0 : double.parse(_daysController.text);
-
-    return years + (months / 12) + (days / 360);
-  }
-
   void _calculate() {
     if (_formKey.currentState!.validate()) {
-      double interest = double.parse(_interestController.text);
       double capital = double.parse(_capitalController.text);
-
-      // Validar que capital no sea cero para evitar división por cero
-      if (capital == 0) {
-        setState(() {
-          _resultText = 'Error: El capital no puede ser cero';
-          _resultValue = 0.0;
-        });
-        return;
-      }
-
-      // Convertir tiempo a años decimales
+      double rate = double.parse(_rateController.text) / 100;
       double timeInYears = _convertTimeToYears();
-
-      // Validar que el tiempo no sea cero
-      if (timeInYears == 0) {
-        setState(() {
-          _resultText = 'Error: El tiempo no puede ser cero';
-          _resultValue = 0.0;
-        });
-        return;
-      }
-
-      // Fórmula: i = I / (C * t)
-      double rate = (interest / (capital * timeInYears)) * 100;
+      double resultValue = 0.0;
+      String resultText = '';
 
       setState(() {
-        _resultValue = rate;
-        _resultText = 'Tasa de Interés (i): ${rate.toStringAsFixed(2)}%';
+        if (_capitalizationType == 'Capitalización Simple') {
+          // M = C * (1 + i * t)
+          resultValue = capital * (1 + rate * timeInYears);
+          resultText = 'Monto Futuro (M): \$${resultValue.toStringAsFixed(2)}';
+        } else if (_capitalizationType == 'Capitalización Compuesta') {
+          // M = C * (1 + i)^t
+          resultValue = capital * pow(1 + rate, timeInYears);
+          resultText = 'Monto Futuro (M): \$${resultValue.toStringAsFixed(2)}';
+        }
+
+        _resultValue = resultValue;
+        _resultText = resultText;
       });
     }
   }
 
-  void _clearAllFields() {
+  void _clearResults() {
     setState(() {
       _resultText = 'Realiza un cálculo para ver el resultado';
       _resultValue = 0.0;
-      _interestController.clear();
       _capitalController.clear();
+      _rateController.clear();
       _yearsController.clear();
       _monthsController.clear();
       _daysController.clear();
@@ -384,7 +462,7 @@ class _InterestRateScreenState extends State<InterestRateScreen> {
   @override
   void dispose() {
     _capitalController.dispose();
-    _interestController.dispose();
+    _rateController.dispose();
     _yearsController.dispose();
     _monthsController.dispose();
     _daysController.dispose();

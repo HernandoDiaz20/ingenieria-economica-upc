@@ -178,6 +178,75 @@ class _SimpleInterestScreenState extends State<SimpleInterestScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Tarjeta informativa sobre Interés Simple
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppConstants.secondaryDarkBlue.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppConstants.neonBlue.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: AppConstants.neonBlue,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          '¿Qué es el Interés Simple?',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Text(
+                      'El interés simple se calcula únicamente sobre el capital inicial durante un período de tiempo. No hay capitalización de intereses.',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Fórmula: I = C × i × t',
+                      style: TextStyle(
+                        color: AppConstants.neonBlue,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        _buildVariableInfo('I', 'Interés'),
+                        _buildVariableInfo('C', 'Capital'),
+                        _buildVariableInfo('i', 'Tasa de interés'),
+                        _buildVariableInfo('t', 'Tiempo'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 25),
+
               // Descripción
               Text(
                 'Calculadora para determinar interés simple, monto futuro, valor presente, tasa de interés o tiempo necesario',
@@ -302,6 +371,42 @@ class _SimpleInterestScreenState extends State<SimpleInterestScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // Widget auxiliar para mostrar información de variables
+  Widget _buildVariableInfo(String variable, String description) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: AppConstants.neonBlue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: AppConstants.neonBlue.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$variable: ',
+              style: TextStyle(
+                color: AppConstants.neonBlue,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            TextSpan(
+              text: description,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+            ),
+          ],
         ),
       ),
     );

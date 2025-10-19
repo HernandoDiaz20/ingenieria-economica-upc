@@ -320,13 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Olvidé contraseña
         TextButton(
           onPressed: () {
-            // TODO: Implementar recuperación de contraseña
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Función en desarrollo'),
-                backgroundColor: AppConstants.neonBlue,
-              ),
-            );
+            Navigator.pushNamed(context, '/forgot-password');
           },
           child: Text(
             '¿Olvidaste tu contraseña?',
