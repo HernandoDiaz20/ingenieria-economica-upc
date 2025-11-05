@@ -4,11 +4,15 @@ Aplicación móvil para cálculos de ingeniería económica desarrollada en Flut
 
 ## 🚀 Funcionalidades
 
-- ✅ Sistema de autenticación
-- ✅ Cálculo de interés simple
-- ✅ Cálculo de interés compuesto  
-- ✅ Cálculo de anualidades
-- ✅ Cálculo de tasa de interés
+- ✅ Sistema de Autenticación
+- ✅ Cálculo de Interés Simple
+- ✅ Cálculo de Interés Compuesto  
+- ✅ Cálculo de Tasa de Interés
+- ✅ Cálculo de Anualidades
+- ✅ Cálculo de Gradientes y Series Variables
+- ✅ Cálculo de Amortización  
+- ✅ Cálculo de Capitalización 
+- ✅ Cálculo de Tasa Interna de Retorno (TIR)
 
 ## 🛠️ Instalación
 
